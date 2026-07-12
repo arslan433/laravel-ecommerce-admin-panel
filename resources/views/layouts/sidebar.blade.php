@@ -1,230 +1,113 @@
-
 @php
-    use App\Helpers\MenuHelper;
-    $menuGroups = MenuHelper::getMenuGroups();
+    use Illuminate\Support\Facades\Route;
 
-    // Get current path
-    $currentPath = request()->path();
+    // Safely declare helper functions only if they don't already exist
+    if (!function_exists('isActiveNav')) {
+        function isActiveNav($patterns) {
+            $patterns = (array) $patterns;
+            foreach ($patterns as $pattern) {
+                if (request()->routeIs($pattern)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    if (!function_exists('hasActiveChild')) {
+        function hasActiveChild($children) {
+            foreach ($children as $child) {
+                if (isActiveNav($child['active_pattern'] ?? $child['route'])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    $navigation = config('navigation.items', []);
 @endphp
 
-<aside id="sidebar"
-    class="fixed flex flex-col mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-99999 border-r border-gray-200"
-    x-data="{
-        openSubmenus: {},
-        init() {
-            // Auto-open Dashboard menu on page load
-            this.initializeActiveMenus();
-        },
-        initializeActiveMenus() {
-            const currentPath = '{{ $currentPath }}';
-
-            @foreach ($menuGroups as $groupIndex => $menuGroup)
-                @foreach ($menuGroup['items'] as $itemIndex => $item)
-                    @if (isset($item['subItems']))
-                        // Check if any submenu item matches current path
-                        @foreach ($item['subItems'] as $subItem)
-                            if (currentPath === '{{ ltrim($subItem['path'], '/') }}' ||
-                                window.location.pathname === '{{ $subItem['path'] }}') {
-                                this.openSubmenus['{{ $groupIndex }}-{{ $itemIndex }}'] = true;
-                            } @endforeach
-            @endif
-            @endforeach
-            @endforeach
-        },
-        toggleSubmenu(groupIndex, itemIndex) {
-            const key = groupIndex + '-' + itemIndex;
-            const newState = !this.openSubmenus[key];
-
-            // Close all other submenus when opening a new one
-            if (newState) {
-                this.openSubmenus = {};
-            }
-
-            this.openSubmenus[key] = newState;
-        },
-        isSubmenuOpen(groupIndex, itemIndex) {
-            const key = groupIndex + '-' + itemIndex;
-            return this.openSubmenus[key] || false;
-        },
-        isActive(path) {
-            return window.location.pathname === path || '{{ $currentPath }}' === path.replace(/^\//, '');
-        }
-    }"
-    :class="{
-        'w-[290px]': $store.sidebar.isExpanded || $store.sidebar.isMobileOpen || $store.sidebar.isHovered,
-        'w-[90px]': !$store.sidebar.isExpanded && !$store.sidebar.isHovered,
-        'translate-x-0': $store.sidebar.isMobileOpen,
-        '-translate-x-full xl:translate-x-0': !$store.sidebar.isMobileOpen
-    }"
-    @mouseenter="if (!$store.sidebar.isExpanded) $store.sidebar.setHovered(true)"
-    @mouseleave="$store.sidebar.setHovered(false)">
-    <!-- Logo Section -->
-    <div class="pt-8 pb-7 flex"
-        :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ?
-        'xl:justify-center' :
-        'justify-start'">
-        <a href="/">
-            <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="dark:hidden" src="/images/logo/logo.svg" alt="Logo" width="150" height="40" />
-            <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" width="150"
-                height="40" />
-            <img x-show="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen"
-                src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
-
-        </a>
+<aside class="flex h-screen w-64 flex-col dark:bg-black">
+    <!-- Logo / Brand -->
+    <div class="flex h-16 items-center justify-center border-b border-gray-700">
+        <span class="text-xl font-bold">Ecommerce Admin</span>
     </div>
 
-    <!-- Navigation Menu -->
-    <div class="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
-        <nav class="mb-6">
-            <div class="flex flex-col gap-4">
-                @foreach ($menuGroups as $groupIndex => $menuGroup)
-                    <div>
-                        <!-- Menu Group Title -->
-                        <h2 class="mb-4 text-xs uppercase flex leading-[20px] text-gray-400"
-                            :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ?
-                            'lg:justify-center' : 'justify-start'">
-                            <template
-                                x-if="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen">
-                                <span>{{ $menuGroup['title'] }}</span>
-                            </template>
-                            <template x-if="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path fill-rule="evenodd" clip-rule="evenodd" d="M5.99915 10.2451C6.96564 10.2451 7.74915 11.0286 7.74915 11.9951V12.0051C7.74915 12.9716 6.96564 13.7551 5.99915 13.7551C5.03265 13.7551 4.24915 12.9716 4.24915 12.0051V11.9951C4.24915 11.0286 5.03265 10.2451 5.99915 10.2451ZM17.9991 10.2451C18.9656 10.2451 19.7491 11.0286 19.7491 11.9951V12.0051C19.7491 12.9716 18.9656 13.7551 17.9991 13.7551C17.0326 13.7551 16.2491 12.9716 16.2491 12.0051V11.9951C16.2491 11.0286 17.0326 10.2451 17.9991 10.2451ZM13.7491 11.9951C13.7491 11.0286 12.9656 10.2451 11.9991 10.2451C11.0326 10.2451 10.2491 11.0286 10.2491 11.9951V12.0051C10.2491 12.9716 11.0326 13.7551 11.9991 13.7551C12.9656 13.7551 13.7491 12.9716 13.7491 12.0051V11.9951Z" fill="currentColor"/>
-                                </svg>
-                            </template>
-                        </h2>
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto px-4 py-6">
+        <ul class="space-y-1">
+            @foreach ($navigation as $item)
+                @php
+                    $hasChildren    = !empty($item['children']);
+                    $isParentActive = $hasChildren && hasActiveChild($item['children']);
+                    $currentActive  = isActiveNav($item['active_pattern'] ?? $item['route']);
+                    $activeClass    = 'bg-gray-800 text-white';
+                    $inactiveClass  = 'text-gray-300 hover:bg-gray-700 hover:text-white';
+                    $linkClass      = ($currentActive || $isParentActive) ? $activeClass : $inactiveClass;
+                @endphp
 
-                        <!-- Menu Items -->
-                        <ul class="flex flex-col gap-1">
-                            @foreach ($menuGroup['items'] as $itemIndex => $item)
+                <li x-data="{ open: {{ $isParentActive ? 'true' : 'false' }} }">
+                    @if ($hasChildren)
+                        {{-- Parent with children --}}
+                        <button
+                            @click="open = !open"
+                            class="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors {{ $linkClass }}"
+                        >
+                            @if (!empty($item['icon']))
+                                <i class="{{ $item['icon'] }} fa-fw mr-3"></i>
+                            @endif
+                            <span class="flex-1">{{ $item['label'] }}</span>
+                            <svg
+                                class="h-4 w-4 transition-transform"
+                                :class="{ 'rotate-90': open }"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+
+                        {{-- Children --}}
+                        <ul
+                            x-show="open"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 -translate-y-1"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            class="mt-1 space-y-1 pl-8"
+                        >
+                            @foreach ($item['children'] as $child)
+                                @php
+                                    $childActive = isActiveNav($child['active_pattern'] ?? $child['route']);
+                                @endphp
                                 <li>
-                                    @if (isset($item['subItems']))
-                                        <!-- Menu Item with Submenu -->
-                                        <button @click="toggleSubmenu({{ $groupIndex }}, {{ $itemIndex }})"
-                                            class="menu-item group w-full"
-                                            :class="[
-                                                isSubmenuOpen({{ $groupIndex }}, {{ $itemIndex }}) ?
-                                                'menu-item-active' : 'menu-item-inactive',
-                                                !$store.sidebar.isExpanded && !$store.sidebar.isHovered ?
-                                                'xl:justify-center' : 'xl:justify-start'
-                                            ]">
-
-                                            <!-- Icon -->
-                                            <span :class="isSubmenuOpen({{ $groupIndex }}, {{ $itemIndex }}) ?
-                                                    'menu-item-icon-active' : 'menu-item-icon-inactive'">
-                                                {!! MenuHelper::getIconSvg($item['icon']) !!}
-                                            </span>
-
-                                            <!-- Text -->
-                                            <span
-                                                x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                                                class="menu-item-text flex items-center gap-2">
-                                                {{ $item['name'] }}
-                                                @if (!empty($item['new']))
-                                                    <span class="absolute right-10"
-                                                        :class="isActive('{{ $item['path'] ?? '' }}') ?
-                                                            'menu-dropdown-badge menu-dropdown-badge-active' :
-                                                            'menu-dropdown-badge menu-dropdown-badge-inactive'">
-                                                        new
-                                                    </span>
-                                                @endif
-                                            </span>
-
-                                            <!-- Chevron Down Icon -->
-                                            <svg x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                                                class="ml-auto w-5 h-5 transition-transform duration-200"
-                                                :class="{
-                                                    'rotate-180 text-brand-500': isSubmenuOpen({{ $groupIndex }},
-                                                        {{ $itemIndex }})
-                                                }"
-                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                            </svg>
-                                        </button>
-
-                                        <!-- Submenu -->
-                                        <div x-show="isSubmenuOpen({{ $groupIndex }}, {{ $itemIndex }}) && ($store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen)">
-                                            <ul class="mt-2 space-y-1 ml-9">
-                                                @foreach ($item['subItems'] as $subItem)
-                                                    <li>
-                                                        <a href="{{ $subItem['path'] }}" class="menu-dropdown-item"
-                                                            :class="isActive('{{ $subItem['path'] }}') ?
-                                                                'menu-dropdown-item-active' :
-                                                                'menu-dropdown-item-inactive'">
-                                                            {{ $subItem['name'] }}
-                                                            <span class="flex items-center gap-1 ml-auto">
-                                                                @if (!empty($subItem['new']))
-                                                                    <span
-                                                                        :class="isActive('{{ $subItem['path'] }}') ?
-                                                                            'menu-dropdown-badge menu-dropdown-badge-active' :
-                                                                            'menu-dropdown-badge menu-dropdown-badge-inactive'">
-                                                                        new
-                                                                    </span>
-                                                                @endif
-                                                                @if (!empty($subItem['pro']))
-                                                                    <span
-                                                                        :class="isActive('{{ $subItem['path'] }}') ?
-                                                                            'menu-dropdown-badge-pro menu-dropdown-badge-pro-active' :
-                                                                            'menu-dropdown-badge-pro menu-dropdown-badge-pro-inactive'">
-                                                                        pro
-                                                                    </span>
-                                                                @endif
-                                                            </span>
-                                                        </a>
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    @else
-                                        <!-- Simple Menu Item -->
-                                        <a href="{{ $item['path'] }}" class="menu-item group"
-                                            :class="[
-                                                isActive('{{ $item['path'] }}') ? 'menu-item-active' :
-                                                'menu-item-inactive',
-                                                (!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ?
-                                                'xl:justify-center' :
-                                                'justify-start'
-                                            ]">
-
-                                            <!-- Icon -->
-                                            <span
-                                                :class="isActive('{{ $item['path'] }}') ? 'menu-item-icon-active' :
-                                                    'menu-item-icon-inactive'">
-                                                {!! MenuHelper::getIconSvg($item['icon']) !!}
-                                            </span>
-
-                                            <!-- Text -->
-                                            <span
-                                                x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                                                class="menu-item-text flex items-center gap-2">
-                                                {{ $item['name'] }}
-                                                @if (!empty($item['new']))
-                                                    <span
-                                                        class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-brand-500 text-white">
-                                                        new
-                                                    </span>
-                                                @endif
-                                            </span>
-                                        </a>
-                                    @endif
+                                    <a
+                                        href="{{ $child['route'] ? route($child['route']) : '#' }}"
+                                        class="block rounded-lg px-3 py-2 text-sm font-medium transition-colors {{ $childActive ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}"
+                                    >
+                                        {{ $child['label'] }}
+                                    </a>
                                 </li>
                             @endforeach
                         </ul>
-                    </div>
-                @endforeach
-            </div>
-        </nav>
+                    @else
+                        {{-- Single item --}}
+                        <a
+                            href="{{ $item['route'] ? route($item['route']) : '#' }}"
+                            class="flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors {{ $linkClass }}"
+                        >
+                            @if (!empty($item['icon']))
+                                <i class="{{ $item['icon'] }} fa-fw mr-3"></i>
+                            @endif
+                            {{ $item['label'] }}
+                        </a>
+                    @endif
+                </li>
+            @endforeach
+        </ul>
+    </nav>
 
-        <!-- Sidebar Widget -->
-        <div x-data x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen" x-transition class="mt-auto">
-            @include('layouts.sidebar-widget')
-        </div>
-
+    <!-- Footer / User area -->
+    <div class="border-t border-gray-700 p-4">
+        <span class="text-sm text-gray-400">© {{ date('Y') }} Your App</span>
     </div>
 </aside>
-
-<!-- Mobile Overlay -->
-<div x-show="$store.sidebar.isMobileOpen" @click="$store.sidebar.setMobileOpen(false)"
-    class="fixed z-50 h-screen w-full bg-gray-900/50"></div>
