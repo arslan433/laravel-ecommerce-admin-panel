@@ -31,6 +31,7 @@
         </div>
     </div>
 
-    
+    @yield('footer-scripts')
+    @stack('scripts') 
 </body>
 </html>

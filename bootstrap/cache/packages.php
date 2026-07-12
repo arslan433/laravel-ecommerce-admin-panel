@@ -48,4 +48,22 @@
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
     ),
   ),
+  'spatie/laravel-permission' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\Permission\\PermissionServiceProvider',
+    ),
+  ),
+  'yajra/laravel-datatables-oracle' => 
+  array (
+    'aliases' => 
+    array (
+      'DataTables' => 'Yajra\\DataTables\\Facades\\DataTables',
+    ),
+    'providers' => 
+    array (
+      0 => 'Yajra\\DataTables\\DataTablesServiceProvider',
+    ),
+  ),
 );
