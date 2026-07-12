@@ -18,10 +18,10 @@ class RoleController extends Controller
     public function index(Request $request)
     {
 
-    $role = Role::query()->get();
-    // dd($role);
+    $roles = Role::query()->get();
+    dd($roles);
 
-        if ($request->ajax()) {
+        if ($request->wantsJson() || $request->ajax() || $request->has('draw')){
             $roles = Role::query();
 
             return DataTables::eloquent($roles)
@@ -58,11 +58,11 @@ class RoleController extends Controller
                 ->orderColumn('id', function ($query, $order) {
                     $query->orderBy('id', $order);
                 })
-                ->rawColumns(['action'])
-                ->toJson();
+                ->rawColumns(['action', 'name', 'id'])
+                ->toArray();
         }
 
-        return view('pages.roles.index');
+        return view('pages.roles.index', compact("roles"));
     }
 
     /**
