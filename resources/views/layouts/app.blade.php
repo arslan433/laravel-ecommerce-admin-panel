@@ -14,7 +14,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full bg-gray-100 dark:bg-black dark:text-gray-100">
+<body class="h-full bg-gray-100 dark:bg-black dark:text-gray-100" x-data="{ sidebarOpen: false }">
     <div class="flex h-full">
         <!-- Sidebar -->
         @include('layouts.sidebar')

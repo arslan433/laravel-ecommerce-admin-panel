@@ -10,13 +10,6 @@ Route::prefix('admin')->middleware('auth')->as('admin.')->group(function () {
     Route::get('/', function () {
         return view('pages.dashboard');
     })->name('dashboard');
-
-
-
-    Route::get('/products', function () { return 'Products Page'; })->name('products.index');
-    Route::get('/orders', function () { return 'Orders Page'; })->name('orders.index');
-    Route::get('/customers', function () { return 'Customers Page'; })->name('customers.index');
-
 });
 
 Route::middleware('auth')->group(function () {
@@ -25,4 +18,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
