@@ -19,7 +19,7 @@ class RoleController extends Controller
     {
 
     $roles = Role::query()->get();
-    dd($roles);
+    // dd($roles);
 
         if ($request->wantsJson() || $request->ajax() || $request->has('draw')){
             $roles = Role::query();
@@ -59,7 +59,7 @@ class RoleController extends Controller
                     $query->orderBy('id', $order);
                 })
                 ->rawColumns(['action', 'name', 'id'])
-                ->toArray();
+                ->toJson();
         }
 
         return view('pages.roles.index', compact("roles"));

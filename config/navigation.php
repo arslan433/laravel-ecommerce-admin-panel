@@ -14,6 +14,12 @@ return [
             'route' => 'admin.dashboard',
             'active_pattern' => 'admin.dashboard',
         ],
+        [
+            'label' => 'Roles',
+            'icon' => 'fa-solid fa-home',              // Font Awesome icon
+            'route' => 'admin.roles.index',
+            'active_pattern' => 'admin.roles',
+        ],
         // [
         //     'label' => 'User Management',
         //     'icon' => 'fa-solid fa-users',

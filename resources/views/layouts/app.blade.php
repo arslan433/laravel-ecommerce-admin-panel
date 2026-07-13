@@ -1,9 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-      x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }"
-      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
-      :class="{ 'dark': darkMode }"
-      class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,9 +8,11 @@
 
     <!-- Fonts (Font Awesome CDN or npm install) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link src={{ asset('theme/css/style.css') }} rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="h-full bg-gray-100 dark:bg-black dark:text-gray-100" x-data="{ sidebarOpen: false }">
     <div class="flex h-full">
         <!-- Sidebar -->
@@ -31,7 +30,12 @@
         </div>
     </div>
 
+    <script src="{{ asset('assets/theme/js/index.js') }}"></script>
+
+
     @yield('footer-scripts')
-    @stack('scripts') 
+    @stack('scripts')
+
 </body>
+
 </html>
