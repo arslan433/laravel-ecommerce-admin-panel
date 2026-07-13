@@ -107,3 +107,22 @@
     box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.1) !important;
     border-color: #cbd5e1 !important;
 }
+
+.text-sm {
+    font-size: 0.85rem !important;
+}
+
+.custom-action-btn {
+    transition: all 0.15s ease-in-out;
+    border-radius: 20px !important;
+}
+
+.hover-bg-slate:hover {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+.hover-bg-danger-subtle:hover {
+    background-color: #dbabae !important;
+    color: #d9002f !important;
+}

@@ -216,4 +216,8 @@ return [
 
         'store' => 'default',
     ],
+    
+    'default' => [
+        'guard' => 'web',
+    ]
 ];

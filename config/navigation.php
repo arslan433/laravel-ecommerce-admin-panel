@@ -31,9 +31,14 @@ return [
                     'active_pattern' => 'admin.users.index',
                 ],
                 [
-                    'label' => 'Roles & Permissions',
+                    'label' => 'Roles',
                     'route' => 'admin.roles.index',
-                    'active_pattern' => ['admin.roles.*', 'admin.permissions.*'],
+                    'active_pattern' => ['admin.roles.*'],
+                ],
+                [
+                    'label' => 'Permissions',
+                    'route' => 'admin.permissions.index',
+                    'active_pattern' => ['admin.permissions.*'],
                 ],
             ],
         ],

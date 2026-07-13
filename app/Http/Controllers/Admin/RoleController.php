@@ -36,14 +36,20 @@ class RoleController extends Controller
                     $editUrl   = route('admin.roles.edit', $role->id);
                     $deleteUrl = route('admin.roles.destroy', $role->id);
 
-                    return '
-                    <a href="'.$editUrl.'" class="btn btn-sm btn-warning ">Edit</a>
-                    <form action="'.$deleteUrl.'" method="POST" style="display:inline-block;"
-                        onsubmit="return confirm(\'Are you sure?\')">
-                        '.csrf_field().'
-                        '.method_field('DELETE').'
-                        <button type="submit" class="btn btn-sm btn-danger ">Delete</button>
-                    </form>
+                      return '
+                        <div class="d-flex align-items-center gap-2">
+                         <a href="' . $editUrl . '" class="btn btn-light border-light text-dark rounded-pill px-3 py-1 text-sm shadow-sm fw-medium custom-action-btn hover-bg-slate">
+                          <i class="bi bi-pencil-square me-1 text-secondary"></i> Edit
+                         </a>
+        
+                          <form action="' . $deleteUrl . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure             you want to delete this item?\')">
+                           ' . csrf_field() . '
+                            ' . method_field('DELETE') . '
+                          <button type="submit" class="btn btn-link text-danger text-decoration-none rounded-pill px-3 py-1 text-sm fw-medium custom-action-btn hover-bg-danger-subtle">
+                            <i class="bi bi-trash3 me-1"></i> Delete
+                             </button>
+                            </form>
+                         </div>
                 ';
                 })
                 ->filterColumn('name', function ($query, $keyword) {
