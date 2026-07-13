@@ -14,29 +14,29 @@ return [
             'route' => 'admin.dashboard',
             'active_pattern' => 'admin.dashboard',
         ],
-        [
-            'label' => 'Roles',
-            'icon' => 'fa-solid fa-home',              // Font Awesome icon
-            'route' => 'admin.roles.index',
-            'active_pattern' => 'admin.roles',
-        ],
         // [
-        //     'label' => 'User Management',
-        //     'icon' => 'fa-solid fa-users',
-        //     'active_pattern' => 'admin.users.*',
-        //     'children' => [
-        //         [
-        //             'label' => 'All Users',
-        //             'route' => 'admin.users.index',
-        //             'active_pattern' => 'admin.users.index',
-        //         ],
-        //         [
-        //             'label' => 'Roles & Permissions',
-        //             'route' => 'admin.roles.index',
-        //             'active_pattern' => ['admin.roles.*', 'admin.permissions.*'],
-        //         ],
-        //     ],
+        //     'label' => 'Roles',
+        //     'icon' => 'fa-solid fa-user',              // Font Awesome icon
+        //     'route' => 'admin.roles.index',
+        //     'active_pattern' => 'admin.roles.*',
         // ],
+        [
+            'label' => 'User Management',
+            'icon' => 'fa-solid fa-users',
+            'active_pattern' => 'admin.users.*',
+            'children' => [
+                [
+                    'label' => 'All Users',
+                    'route' => 'admin.users.index',
+                    'active_pattern' => 'admin.users.index',
+                ],
+                [
+                    'label' => 'Roles & Permissions',
+                    'route' => 'admin.roles.index',
+                    'active_pattern' => ['admin.roles.*', 'admin.permissions.*'],
+                ],
+            ],
+        ],
         // [
         //     'label' => 'Content',
         //     'icon' => 'fa-solid fa-file-lines',

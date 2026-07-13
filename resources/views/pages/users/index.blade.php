@@ -4,19 +4,17 @@
     <div class="container-fluid py-4 px-md-4">
         <div class="row">
             <div class="col-12">
-                <!-- Premium Card Wrapper -->
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                     <div class="card-body p-4 p-md-5">
                         
-                        <!-- Header Section -->
                         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 pb-3 border-bottom border-light">
                             <div>
-                                <h4 class="card-title fw-bold text-dark m-0 mb-1 d-inline-block">Role Management</h4>
+                                <h4 class="card-title fw-bold text-dark m-0 mb-1 d-inline-block">Users</h4>
                                
                             </div>
                             <div>
-                                <a class="btn btn-dark rounded-pill px-4 shadow-sm fw-medium" href="{{ route('admin.roles.create') }}">
-                                    Add Role
+                                <a class="btn btn-dark rounded-pill px-4 shadow-sm fw-medium" href="{{ route('admin.users.create') }}">
+                                    Add User
                                 </a>
                             </div>
                         </div>
@@ -29,8 +27,7 @@
                             </div>
                         @endif
 
-                        <!-- Filter & Search Toolbar Layout -->
-                        <div class="row align-items-center mb-4 justify-content-between g-3" id="roles-toolbar">
+                        <div class="row align-items-center mb-4 justify-content-between g-3" id="users-toolbar">
                             <div class="col-sm-auto">
                                 <div id="dt-length" class="custom-dt-length"></div>
                             </div>
@@ -39,18 +36,18 @@
                             </div>
                         </div>
 
-                        <!-- Table Container (Horizontal Scroll Fixed) -->
                         <div class="table-responsive rounded-3 border border-light custom-table-wrapper">
-                            <table id="roles-table" class="table align-middle table-hover mb-0 w-100">
+                            <table id="users-table" class="table align-middle table-hover mb-0 w-100">
                                 <thead class="table-light text-uppercase tracking-wider">
                                     <tr>
                                         <th class="py-2 text-muted fw-bold">#</th>
                                         <th class="py-2 px-4 text-muted fw-bold">Name</th>
+                                        <th class="py-2 px-4 text-muted fw-bold">Email</th>
+                                        <th class="py-2 px-4 text-muted fw-bold">Role</th>
                                         <th class="py-2 px-4 text-muted fw-bold">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white">
-                                    <!-- Populated via Server-Side Datatables -->
                                 </tbody>
                             </table>
                         </div>
@@ -65,14 +62,16 @@
 @section('footer-scripts')
     <script>
         $(document).ready(function () {
-            $('#roles-table').DataTable({
+            $('#users-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route("admin.roles.index") }}',
+               ajax: '{{ route("admin.users.index") }}',
                 columns: [
-                    {data: 'id', name: 'id'},
-                    {data: 'name', name: 'name'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
+                    { data: 'id' },
+                    { data: 'name', name: 'name' },
+                    { data: 'email', name: 'email' },
+                    { data: 'role', name: 'role', orderable: false, searchable: false },
+                    { data: 'action', name: 'action', orderable: false, searchable: false }
                 ],
                 dom: "<'row d-none'<'col-12'lf>>" + 
                      "tr" +
@@ -83,7 +82,7 @@
                 autoWidth: false,
                 language: {
                     search: "",
-                    searchPlaceholder: "Quick lookup roles..."
+                    searchPlaceholder: "Quick lookup users..."
                 },
                 initComplete: function () {
                     $('#dt-length').append($('.dataTables_length'));

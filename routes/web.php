@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,15 @@ Route::prefix('admin')->middleware(['auth'])->as('admin.')->group(function () {
         'edit' => 'roles.edit',
         'update' => 'roles.update',
         'destroy' => 'roles.destroy',
+    ])->except('show');
+
+     Route::resource('users', UserController::class)->names([
+        'index' => 'users.index',
+        'create' => 'users.create',
+        'store' => 'users.store',
+        'edit' => 'users.edit',
+        'update' => 'users.update',
+        'destroy' => 'users.destroy',
     ])->except('show');
 });
 

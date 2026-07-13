@@ -18,9 +18,6 @@ class RoleController extends Controller
     public function index(Request $request)
     {
 
-    $roles = Role::query()->get();
-    // dd($roles);
-
         if ($request->wantsJson() || $request->ajax() || $request->has('draw')){
             $roles = Role::query();
 
@@ -62,7 +59,7 @@ class RoleController extends Controller
                 ->toJson();
         }
 
-        return view('pages.roles.index', compact("roles"));
+        return view('pages.roles.index');
     }
 
     /**

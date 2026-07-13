@@ -2,3 +2,108 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.tracking-wider {
+    letter-spacing: 0.06em;
+    font-size: 0.75rem;
+}
+
+.table-light {
+    background-color: #f8fafc !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f5f9;
+    transition: background-color 0.15s ease-in-out;
+}
+
+/* Removes unwanted outer margins generating scrollbars */
+.custom-table-wrapper {
+    overflow-x: hidden !important;
+    width: 100% !important;
+}
+
+#roles-table_wrapper,
+.dataTables_wrapper {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Minimalistic Premium Pagination Buttons CSS overrides */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    /* border: 1px solid #e2e8f0 !important; */
+    color: #475569 !important;
+    border-radius: 20px !important;
+    /* margin: 0 2px; */
+    /* padding: 0.4rem 0.85rem !important; */
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    background: #fff !important;
+    cursor: pointer;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: #1e293b !important;
+    border-color: #1e293b !important;
+    color: #fff !important;
+    font-weight: 600;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+}
+
+/* Fix DataTables native focus indicators */
+.dataTables_filter input:focus {
+    background-color: #fff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.05) !important;
+}
+
+.text-sm {
+    font-size: 0.9rem;
+}
+
+/* Interactive custom styles for form input fields */
+.custom-form-input:focus {
+    background-color: #fff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.05) !important;
+}
+
+/* Premium Hover & Checked micro-interactions for checkboxes grid */
+.custom-permission-card {
+    cursor: pointer;
+    border: 1px solid #f1f5f9 !important;
+}
+
+.custom-permission-card:hover {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Checkbox tint override matching index dark/light mode accents layout */
+.custom-checkbox-input:checked {
+    background-color: #1e293b !important;
+    border-color: #1e293b !important;
+}
+
+.custom-checkbox-input:focus {
+    box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.1) !important;
+    border-color: #cbd5e1 !important;
+}
