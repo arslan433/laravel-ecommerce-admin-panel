@@ -17,6 +17,9 @@
                             <a class="btn btn-dark rounded-pill px-4 shadow-sm fw-medium" href="{{ route('admin.permissions.create') }}">
                                 Add Permission
                             </a>
+                            <a class="btn btn-dark rounded-pill px-4 shadow-sm fw-medium" href="{{ route('admin.sync-permissions') }}">
+                                Sync Permission
+                            </a>
                             @else
                             <button class="btn btn-dark rounded-pill px-4 shadow-sm fw-medium opacity-50 cursor-not-allowed" disabled>
                                 Add Permission

@@ -39,6 +39,8 @@ Route::prefix('admin')->middleware(['auth'])->as('admin.')->group(function () {
         'destroy' => 'users.destroy',
     ])->except('show');
 
+    Route::post('/sync-permissions', [PermissionController::class, 'syncPermissions'])->name('sync-permissions');
+
 });
 
 
