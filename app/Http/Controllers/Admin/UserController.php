@@ -11,6 +11,7 @@ use Spatie\Permission\Models\Role;
 use Throwable;
 use Yajra\DataTables\Exceptions\Exception;
 use Yajra\DataTables\Facades\DataTables;
+use App\Traits\HasContentAuthorization;
 use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
@@ -18,6 +19,8 @@ class UserController extends Controller
     /**
      * @throws Exception
      */
+    use HasContentAuthorization;
+
     public function index(Request $request)
     {
         if ($request->wantsJson() || $request->ajax() || $request->has('draw')) {
@@ -48,7 +51,7 @@ class UserController extends Controller
                     <i class="fa-solid fa-pen-to-square me-1 text-secondary"></i>
                     </a>';
                     }
-                    $deleteForm = ''; 
+                    $deleteForm = '';
                     if (Gate::allows('user-delete')) {
                         $deleteForm = '<form action="' . $deleteUrl . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure you want to delete this item?\')"> '
                             . csrf_field() . ' ' . method_field('DELETE') . ' 
@@ -70,7 +73,7 @@ class UserController extends Controller
                 ->toJson();
         }
 
-        return view('pages.users.index');
+        return $this->authorizeContent('user-index','pages.users.index');
     }
 
 
@@ -80,7 +83,7 @@ class UserController extends Controller
         $guard = config('auth.defaults.admin_guard');
         $roles = Role::query()->where('guard_name', $guard)->orderBy('name')->get();
 
-        return view('pages.users.create', compact('roles'));
+        return $this->authorizeContent('user-create','pages.users.create', compact('roles'));
     }
 
     /**
@@ -113,7 +116,7 @@ class UserController extends Controller
         $roles = Role::query()->where('guard_name', $guard)->orderBy('name')->get();
         $selectedRole = $user->roles->first()?->name;
 
-        return view('pages.users.create', compact('user', 'roles', 'selectedRole'));
+        return $this->authorizeContent('user-edit','pages.users.create', compact('user', 'roles', 'selectedRole'));
     }
 
     /**
@@ -152,6 +155,7 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         // $this->authorize('delete', $user);
+        $this->authorizeAction('user-delete');
         $user->delete();
 
         return to_route('admin.users.index')->with('success', 'User deleted successfully.');

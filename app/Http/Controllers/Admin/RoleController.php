@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -10,10 +11,14 @@ use Yajra\DataTables\Exceptions\Exception;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Gate;
 
+use App\Traits\HasContentAuthorization;
+
 
 
 class RoleController extends Controller
 {
+    use HasContentAuthorization;
+
     /**
      * Display a listing of the resource.
      * @throws Exception
@@ -46,7 +51,7 @@ class RoleController extends Controller
                     <i class="fa-solid fa-pen-to-square me-1 text-secondary"></i>
                     </a>';
                     }
-                    $deleteForm = ''; 
+                    $deleteForm = '';
                     if (Gate::allows('role-delete')) {
                         $deleteForm = '<form action="' . $deleteUrl . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure you want to delete this item?\')"> '
                             . csrf_field() . ' ' . method_field('DELETE') . ' 
@@ -77,7 +82,7 @@ class RoleController extends Controller
                 ->toJson();
         }
 
-        return view('pages.roles.index');
+        return $this->authorizeContent('role-index', 'pages.roles.index');
     }
 
     /**
@@ -86,8 +91,13 @@ class RoleController extends Controller
 
     public function create()
     {
+        // if (!auth()->user()->can('role-create')) {
+        //     return view('components.403-error'); 
+        // }
         $permissions = Permission::all();
-        return view('pages.roles.create', compact('permissions'));
+        return $this->authorizeContent('role-create', 'pages.roles.create', compact('permissions'));
+
+        // return view('pages.roles.create', compact('permissions'));
     }
 
     /**
@@ -121,9 +131,13 @@ class RoleController extends Controller
 
     public function edit(Role $role)
     {
+        // if (!auth()->user()->can('role-edit')) {
+        //     return view('components.403-error');
+        // }
         $permissions = Permission::all();
         $role_permissions = $role->permissions->pluck('id')->toArray();
-        return view('pages.roles.create', compact('role', 'permissions', 'role_permissions'));
+        return $this->authorizeContent('role-edit', 'pages.roles.create', compact('role', 'permissions', 'role_permissions'));
+        // return view('pages.roles.create', compact('role', 'permissions', 'role_permissions'));
     }
 
     /**
@@ -141,10 +155,9 @@ class RoleController extends Controller
             'permissions' => 'nullable|array',
         ]);
 
-        $role->update(['name' => $validated['name'], 'guard_name' => config('permission.default.guard')]);
-        //        if($request->permissions){
         $role->syncPermissions($request->permissions);
-        //        }
+
+        $role->update(['name' => $validated['name'], 'guard_name' => config('permission.default.guard')]);
         return to_route('admin.roles.index')->with('success', 'Role updated successfully.');
     }
 
@@ -154,6 +167,8 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
+        $this->authorizeAction('role-delete');
+
         $role = Role::findOrFail($role->id);
 
         if ($role->name === 'super-admin') {

@@ -8,11 +8,14 @@ use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Gate;
+use App\Traits\HasContentAuthorization;
 
 
 
 class PermissionController extends Controller
 {
+    use HasContentAuthorization;
+
     /**
      * Display a listing of the resource.
      */
@@ -58,7 +61,6 @@ class PermissionController extends Controller
 
                         . $deleteForm .
                         '</div>';
-
                 })
                 ->filterColumn('name', function ($query, $keyword) {
                     $query->where('name', 'like', '%' . $keyword . '%');
@@ -73,7 +75,7 @@ class PermissionController extends Controller
                 ->toJson();
         }
 
-        return view('pages.permissions.index');
+        return $this->authorizeContent('permission-create', 'pages.permissions.index');
     }
 
     /**
@@ -81,7 +83,7 @@ class PermissionController extends Controller
      */
     public function create()
     {
-        return view('pages.permissions.create');
+        return $this->authorizeContent('permission-create', 'pages.permissions.create');
     }
 
     /**
@@ -118,7 +120,7 @@ class PermissionController extends Controller
     public function edit(Permission $permission)
     {
         //        $permission = Permission::where('id', $id)->first();
-        return view('pages.permissions.create', compact('permission'));
+        return $this->authorizeContent('permission-edit', 'pages.permissions.create', compact('permission'));
     }
 
     /**
@@ -143,6 +145,7 @@ class PermissionController extends Controller
      */
     public function destroy(Permission $permission)
     {
+        $this->authorizeAction('permission-delete');
         $permission->delete();
         return to_route('admin.permissions.index')->with('success', 'Permission deleted successfully');
     }
