@@ -20,13 +20,6 @@
 
         <div class="flex items-center gap-4">
             
-            <button
-                @click="darkMode = !darkMode"
-                class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-700 shadow-sm transition-all hover:scale-105 dark:bg-gray-700 dark:text-yellow-300"
-                title="Toggle dark mode"
-            >
-                <i class="fa-solid" :class="darkMode ? 'fa-sun' : 'fa-moon'"></i>
-            </button>
 
             <div class="flex items-center">
                 <x-dropdown align="right" width="48">
