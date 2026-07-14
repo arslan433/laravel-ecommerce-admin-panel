@@ -4,15 +4,15 @@
     <div class="container py-4 px-md-4" style="max-width: 900px;">
         <div class="d-flex flex-column mb-4 pb-3 border-bottom border-light">
             <h1 class="h3 fw-bold text-dark m-0 mb-1">
-                {{ isset($role) ? 'Edit' : 'Add' }} User
+                {{ isset($user) ? 'Edit' : 'Add' }} User
             </h1>
         </div>
 
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
             <div class="card-body p-4 p-md-5">
-                <form action="{{ isset($role) ? route('admin.users.update', $role->id) : route('admin.users.store') }}" method="POST">
+                <form action="{{ isset($user) ? route('admin.users.update', $user->id) : route('admin.users.store') }}" method="POST">
                     @csrf
-                    @if(isset($role)) @method('PUT') @endif
+                    @if(isset($user)) @method('PUT') @endif
 
                     <div class="form-content-wrapper text-dark">
                         @include('pages.users.partials.form')

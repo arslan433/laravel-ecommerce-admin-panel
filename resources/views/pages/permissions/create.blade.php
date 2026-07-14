@@ -11,9 +11,9 @@
 
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
             <div class="card-body p-4 p-md-5">
-                <form action="{{ isset($role) ? route('admin.permissions.update', $role->id) : route('admin.permissions.store') }}" method="POST">
+                <form action="{{ isset($permission) ? route('admin.permissions.update', $permission->id) : route('admin.permissions.store') }}" method="POST">
                     @csrf
-                    @if(isset($role)) @method('PUT') @endif
+                    @if(isset($permission)) @method('PUT') @endif
 
                     <div class="form-content-wrapper text-dark">
                         @include('pages.permissions.partials.form')
