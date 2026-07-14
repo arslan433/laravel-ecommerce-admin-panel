@@ -10,10 +10,8 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', 'admin/');
 Route::prefix('admin')->middleware(['auth'])->as('admin.')->group(function () {
     
-    // Dashboard (Accessible to all authenticated users)
     Route::get('/', fn() => view('pages.dashboard'))->name('dashboard');
 
-    // 1. ROLES MODULE (Dynamic Security)
     Route::middleware(['permission:role-index'])->group(function() {
         Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
         
@@ -26,7 +24,6 @@ Route::prefix('admin')->middleware(['auth'])->as('admin.')->group(function () {
         Route::delete('roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy')->middleware('permission:role-delete');
     });
 
-    // 2. USERS MODULE (Dynamic Security)
     Route::middleware(['permission:user-index'])->group(function() {
         Route::get('users', [UserController::class, 'index'])->name('users.index');
         
@@ -39,7 +36,6 @@ Route::prefix('admin')->middleware(['auth'])->as('admin.')->group(function () {
         Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy')->middleware('permission:user-delete');
     });
 
-    // 3. PERMISSIONS MODULE (Dynamic Security)
     Route::middleware(['permission:permission-index'])->group(function() {
         Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
         

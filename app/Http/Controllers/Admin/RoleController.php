@@ -8,6 +8,8 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\Exceptions\Exception;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Gate;
+
 
 
 class RoleController extends Controller
@@ -33,27 +35,34 @@ class RoleController extends Controller
                 })
                 ->addColumn('action', function ($role) {
                     if ($role->name === 'super-admin') {
-                        return '-';
+                        return '<div class="px-5"> - </div>';
                     }
 
-                    $editUrl   = route('admin.roles.edit', $role->id);
+                    $editUrl = route('admin.roles.edit', $role->id);
                     $deleteUrl = route('admin.roles.destroy', $role->id);
+                    $editButton = '';
+                    if (Gate::allows('role-edit')) {
+                        $editButton = '<a href="' . $editUrl . '" class="custom-edit">
+                    <i class="fa-solid fa-pen-to-square me-1 text-secondary"></i>
+                    </a>';
+                    }
+                    $deleteForm = ''; 
+                    if (Gate::allows('role-delete')) {
+                        $deleteForm = '<form action="' . $deleteUrl . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure you want to delete this item?\')"> '
+                            . csrf_field() . ' ' . method_field('DELETE') . ' 
+                         <button type="submit" class="custom-delete">
+                        <i class="fa-solid fa-trash me-1"></i>
+                        </button>
+                         </form>';
+                    }
 
                     return '
-                        <div class="d-flex align-items-center gap-2">
-                         <a href="' . $editUrl . '" class="btn btn-light border-light text-dark rounded-pill px-3 py-1 text-sm shadow-sm fw-medium custom-action-btn hover-bg-slate">
-                          <i class="bi bi-pencil-square me-1 text-secondary"></i> Edit
-                         </a>
-        
-                          <form action="' . $deleteUrl . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure             you want to delete this item?\')">
-                           ' . csrf_field() . '
-                            ' . method_field('DELETE') . '
-                          <button type="submit" class="btn btn-link text-danger text-decoration-none rounded-pill px-3 py-1 text-sm fw-medium custom-action-btn hover-bg-danger-subtle">
-                            <i class="bi bi-trash3 me-1"></i> Delete
-                             </button>
-                            </form>
-                         </div>
-                ';
+
+                        <div class="d-flex align-items-center gap-2">'
+                        . $editButton
+
+                        . $deleteForm .
+                        '</div>';
                 })
                 ->filterColumn('name', function ($query, $keyword) {
                     $query->where('name', 'like', '%' . $keyword . '%');
@@ -77,7 +86,6 @@ class RoleController extends Controller
 
     public function create()
     {
-
         $permissions = Permission::all();
         return view('pages.roles.create', compact('permissions'));
     }
@@ -126,7 +134,6 @@ class RoleController extends Controller
         $role = Role::findOrFail($role->id);
 
         if ($role->name === 'super-admin') {
-            //            dd($role->name);
             return back()->with('error', 'Super Admin role cannot be edited.');
         }
         $validated = $request->validate([
@@ -150,7 +157,6 @@ class RoleController extends Controller
         $role = Role::findOrFail($role->id);
 
         if ($role->name === 'super-admin') {
-            //            dd($role->name);
             return back()->with('error', 'Super Admin role cannot be edited.');
         }
 

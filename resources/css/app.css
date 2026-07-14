@@ -126,3 +126,44 @@
     background-color: #dbabae !important;
     color: #d9002f !important;
 }
+
+.custom-edit{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #212529;
+    border-radius: 9999px;
+    padding: 0.40rem 0.75rem;
+    font-size: 0.875rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out;
+}
+.custom-edit:hover{
+        background-color: #e2e8f0; /* slate color */
+
+}
+
+.custom-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: #dc3545; /* text-danger */
+    text-decoration: none; /* text-decoration-none */
+    border-radius: 9999px; /* rounded-pill */
+    padding: 0.40rem 0.75rem; /* py-1 px-3 */
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 500; /* fw-medium */
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .custom-delete:hover {
+    background-color: #f8d7da; /* Light red/danger subtle background */
+  }
