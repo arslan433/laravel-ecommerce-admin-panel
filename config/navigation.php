@@ -13,13 +13,8 @@ return [
             'icon' => 'fa-solid fa-home',              // Font Awesome icon
             'route' => 'admin.dashboard',
             'active_pattern' => 'admin.dashboard',
+            
         ],
-        // [
-        //     'label' => 'Roles',
-        //     'icon' => 'fa-solid fa-user',              // Font Awesome icon
-        //     'route' => 'admin.roles.index',
-        //     'active_pattern' => 'admin.roles.*',
-        // ],
         [
             'label' => 'User Management',
             'icon' => 'fa-solid fa-users',
@@ -29,16 +24,19 @@ return [
                     'label' => 'All Users',
                     'route' => 'admin.users.index',
                     'active_pattern' => 'admin.users.index',
+                     'permission' => 'user-index'
                 ],
                 [
                     'label' => 'Roles',
                     'route' => 'admin.roles.index',
                     'active_pattern' => ['admin.roles.*'],
+                     'permission' => 'role-index'
                 ],
                 [
                     'label' => 'Permissions',
                     'route' => 'admin.permissions.index',
                     'active_pattern' => ['admin.permissions.*'],
+                    'permission' => 'permission-index'
                 ],
             ],
         ],

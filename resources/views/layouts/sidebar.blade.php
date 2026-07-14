@@ -59,8 +59,36 @@
         <ul class="space-y-1">
             @foreach ($navigation as $item)
                 @php
-                    $hasChildren    = !empty($item['children']);
-                    $isParentActive = $hasChildren && hasActiveChild($item['children']);
+                    $hasChildren = !empty($item['children']);
+                    $hasParentPermission = empty($item['permission']) || auth()->user()->can($item['permission']);
+                    
+                    $visibleChildren = [];
+                    if ($hasChildren) {
+                        // Filter out children that user doesn't have permission for
+                        $visibleChildren = array_filter($item['children'], function($child) {
+                            return empty($child['permission']) || auth()->user()->can($child['permission']);
+                        });
+                    }
+                @endphp
+
+                {{-- Rule 1: Agar single item hai aur uski permission nahi hai -> Hide it --}}
+                @if (!$hasChildren && !$hasParentPermission)
+                    @continue
+                @endif
+
+                {{-- Rule 2: Agar parent menu hai --}}
+                @if ($hasChildren)
+                    {{-- Agar parent ke paas na apni permission hai aur na koi child bacha hai -> Hide it --}}
+                    {{-- Lekin agar parent permission fail ho jaye aur kisi child ki permission ho, toh chalne do --}}
+                    @if (empty($visibleChildren))
+                        @continue
+                    @endif
+                @endif
+
+                @php
+                    // Final setups for rendering items safely
+                    $renderChildren = !empty($visibleChildren);
+                    $isParentActive = $renderChildren && hasActiveChild($visibleChildren);
                     $currentActive  = isActiveNav($item['active_pattern'] ?? $item['route']);
                     $activeClass    = 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white';
                     $inactiveClass  = 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-900 dark:hover:text-white';
@@ -68,8 +96,8 @@
                 @endphp
 
                 <li x-data="{ open: {{ $isParentActive ? 'true' : 'false' }} }">
-                    @if ($hasChildren)
-                        {{-- Parent with children --}}
+                    @if ($renderChildren)
+                        {{-- Parent Layout Template --}}
                         <button
                             @click="open = !open"
                             class="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors {{ $linkClass }}"
@@ -87,7 +115,7 @@
                             </svg>
                         </button>
 
-                        {{-- Children --}}
+                        {{-- Children items lists loop --}}
                         <ul
                             x-show="open"
                             x-transition:enter="transition ease-out duration-200"
@@ -95,7 +123,7 @@
                             x-transition:enter-end="opacity-100 translate-y-0"
                             class="mt-1 space-y-1 pl-8"
                         >
-                            @foreach ($item['children'] as $child)
+                            @foreach ($visibleChildren as $child)
                                 @php
                                     $childActive = isActiveNav($child['active_pattern'] ?? $child['route']);
                                 @endphp
@@ -110,7 +138,7 @@
                             @endforeach
                         </ul>
                     @else
-                        {{-- Single item --}}
+                        {{-- Standalone Single item link --}}
                         <a
                             href="{{ $item['route'] ? route($item['route']) : '#' }}"
                             class="flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors {{ $linkClass }}"
