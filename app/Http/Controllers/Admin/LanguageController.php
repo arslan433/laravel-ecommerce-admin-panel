@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\LanguageRequest;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use App\Traits\HasContentAuthorization;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\DB;
 
 
 
@@ -88,9 +90,23 @@ class LanguageController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(LanguageRequest $request)
     {
-        dd($request->all());
+        // dd($request->all());
+        $validated = $request->all();
+
+        DB::transaction(function () use ($validated) {
+            Language::create([
+                'name' => $validated['name'],
+                'code' => $validated['code'],
+                'directory' => $validated['directory'] ?? null,
+                'sort_order' => (int)($validated['sort_order'] ?? 0),
+                'default' => (bool)($validated['default'] ?? false),
+                'status' => (bool)($validated['status'] ?? false),
+            ]);
+        });
+
+        return to_route('admin.languages.index')->with('success', 'Language created successfully.');
     }
 
     /**
@@ -104,9 +120,9 @@ class LanguageController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Language $language)
     {
-        //
+        return $this->authorizeContent('language-edit', 'pages.languages.create', compact('language') );
     }
 
     /**
