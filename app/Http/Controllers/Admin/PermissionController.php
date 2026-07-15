@@ -75,7 +75,7 @@ class PermissionController extends Controller
                 ->toJson();
         }
 
-        return $this->authorizeContent('permission-create', 'pages.permissions.index');
+        return $this->authorizeContent('permission-index', 'pages.permissions.index');
     }
 
     /**

@@ -4,7 +4,7 @@
     <div class="container py-4 px-md-4" style="max-width: 900px;">
         <div class="d-flex flex-column mb-4 pb-3 border-bottom border-light">
             <h1 class="h3 fw-bold text-dark m-0 mb-1">
-                {{ isset($role) ? 'Edit' : 'Add' }} Permission
+                {{ isset($permission) ? 'Edit' : 'Add' }} Permission
             </h1>
             <small class="text-muted">Define the position title, assign permissions, and layout system entry parameters.</small>
         </div>
@@ -24,7 +24,7 @@
                             Cancel
                         </a>
                         <button type="submit" class="btn btn-dark rounded-pill px-4 shadow-sm fw-medium transition-all">
-                            <i class="bi bi-check-lg me-1"></i> Save Permission
+                            <i class="fa fa-check"></i> {{ isset($permission) ? 'Update' : 'Save' }} Permission
                         </button>
                     </div>
                 </form>

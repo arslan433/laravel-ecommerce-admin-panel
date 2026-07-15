@@ -57,11 +57,12 @@ return [
         //         ],
         //     ],
         // ],
-        // [
-        //     'label' => 'Settings',
-        //     'icon' => 'fa-solid fa-gear',
-        //     'route' => 'admin.settings',
-        //     'active_pattern' => 'admin.settings',
-        // ],
+        [
+            'label' => 'Languages',
+            'icon' => 'fa-solid fa-gear',
+            'route' => 'admin.languages.index',
+            'active_pattern' => 'admin.languages',
+            'permission' => 'language-create'
+        ],
     ],
 ];
