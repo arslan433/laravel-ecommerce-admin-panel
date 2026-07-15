@@ -1,5 +1,4 @@
 @php
-    use Illuminate\Support\Facades\Route;
 
     if (!function_exists('isActiveNav')) {
         function isActiveNav($patterns) {
@@ -71,15 +70,11 @@
                     }
                 @endphp
 
-                {{-- Rule 1: Agar single item hai aur uski permission nahi hai -> Hide it --}}
                 @if (!$hasChildren && !$hasParentPermission)
                     @continue
                 @endif
 
-                {{-- Rule 2: Agar parent menu hai --}}
                 @if ($hasChildren)
-                    {{-- Agar parent ke paas na apni permission hai aur na koi child bacha hai -> Hide it --}}
-                    {{-- Lekin agar parent permission fail ho jaye aur kisi child ki permission ho, toh chalne do --}}
                     @if (empty($visibleChildren))
                         @continue
                     @endif
