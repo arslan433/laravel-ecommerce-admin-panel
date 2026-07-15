@@ -62,7 +62,7 @@ return [
             'icon' => 'fa-solid fa-gear',
             'route' => 'admin.languages.index',
             'active_pattern' => 'admin.languages',
-            'permission' => 'language-create'
+            'permission' => 'language-index'
         ],
     ],
 ];

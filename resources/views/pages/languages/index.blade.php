@@ -49,7 +49,10 @@
                             <thead class="table-light text-uppercase tracking-wider">
                                 <tr>
                                     <th class="py-2 text-muted fw-bold">#</th>
-                                    <th class="py-2 px-4 text-muted fw-bold">Name</th>
+                                    <th class="py-2 text-muted fw-bold">Name</th>
+                                    <th class="py-2 text-muted fw-bold">Code</th>
+                                    <th class="py-2 text-muted fw-bold">Default</th>
+                                    <th class="py-2 text-muted fw-bold">Status</th>
                                     <th class="py-2 px-4 text-muted fw-bold">Actions</th>
                                 </tr>
                             </thead>
@@ -79,6 +82,18 @@
                 {
                     data: 'name',
                     name: 'name'
+                },
+                {
+                    data: 'code',
+                    name: 'code'
+                },
+                {
+                    data: 'default',
+                    name: 'default'
+                },
+                {
+                    data: 'status',
+                    name: 'status'
                 },
                 {
                     data: 'action',

@@ -27,11 +27,15 @@ class LanguageController extends Controller
 
 
             return DataTables::eloquent($languages)
-                ->addColumn('id', function ($language) {
-                    return $language->id;
+                ->editColumn('default', function ($language) {
+                    return $language->default
+                        ? '<span class="badge bg-primary">Default</span>'
+                        : '<span class="px-3"> — </span>';
                 })
-                ->addColumn('name', function ($language) {
-                    return $language->name ?? '-';
+                ->editColumn('status', function ($language) {
+                    return $language->status
+                        ? '<span class="badge bg-success">Active</span>'
+                        : '<span class="badge bg-danger">Inactive</span>';
                 })
                 ->addColumn('action', function ($language) {
 
@@ -72,7 +76,7 @@ class LanguageController extends Controller
                 ->orderColumn('id', function ($query, $order) {
                     $query->orderBy('id', $order);
                 })
-                ->rawColumns(['action', 'name', 'id'])
+                ->rawColumns(['status','action', 'default'])
                 ->toJson();
         }
 
@@ -122,22 +126,36 @@ class LanguageController extends Controller
      */
     public function edit(Language $language)
     {
-        return $this->authorizeContent('language-edit', 'pages.languages.create', compact('language') );
+        return $this->authorizeContent('language-edit', 'pages.languages.create', compact('language'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(LanguageRequest $request, Language $language)
     {
-        //
+        $validated = $request->all();
+
+        DB::transaction(function () use ($validated, $language) {
+            $language->update([
+                'name' => $validated['name'],
+                'code' => $validated['code'],
+                'directory' => $validated['directory'] ?? null,
+                'sort_order' => (int)($validated['sort_order'] ?? 0),
+                'default' => (bool)($validated['default'] ?? $language->default),
+                'status' => (bool)($validated['status'] ?? $language->status),
+            ]);
+        });
+        return to_route('admin.languages.index')->with('success', 'Language updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Language $language)
     {
-        //
+        $this->authorizeAction('language-delete');
+        $language->delete();
+        return to_route('admin.languages.index')->with('success', 'Language deleted successfully.');
     }
 }
