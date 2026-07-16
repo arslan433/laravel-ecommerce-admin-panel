@@ -50,7 +50,8 @@ class InsertPermissions extends Command
         return [
             'user',
             'role',
-            'permission'
+            'permission',
+            'language'
         ];
     }
 

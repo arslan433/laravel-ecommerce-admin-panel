@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PermissionController;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', 'admin/');
 Route::prefix('admin')->middleware(['auth'])->as('admin.')->group(function () {
-    
+
     Route::get('/', fn() => view('pages.dashboard'))->name('dashboard');
 
     Route::resource('roles', RoleController::class)->names([
@@ -30,7 +31,7 @@ Route::prefix('admin')->middleware(['auth'])->as('admin.')->group(function () {
         'destroy' => 'permissions.destroy',
     ])->except('show');
 
-     Route::resource('users', UserController::class)->names([
+    Route::resource('users', UserController::class)->names([
         'index' => 'users.index',
         'create' => 'users.create',
         'store' => 'users.store',
@@ -41,6 +42,14 @@ Route::prefix('admin')->middleware(['auth'])->as('admin.')->group(function () {
 
     Route::get('/sync-permissions', [PermissionController::class, 'syncPermissions'])->name('sync-permissions');
 
+    Route::resource('languages', LanguageController::class)->names([
+        'index' => 'languages.index',
+        'create' => 'languages.create',
+        'store' => 'languages.store',
+        'edit' => 'languages.edit',
+        'update' => 'languages.update',
+        'destroy' => 'languages.destroy',
+    ])->except('show');
 });
 
 

@@ -40,7 +40,7 @@
 
 <aside 
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-    class="fixed inset-y-0 left-0 z-50 flex h-screen w-64 flex-col bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0"
+    class="fixed inset-y-0 left-0 z-50 flex h-auto w-64 flex-col bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0"
     x-transition:enter="transition ease-in-out duration-300 transform"
     x-transition:leave="transition ease-in-out duration-300 transform"
 >
