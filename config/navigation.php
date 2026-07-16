@@ -61,7 +61,7 @@ return [
             'label' => 'Languages',
             'icon' => 'fa-solid fa-gear',
             'route' => 'admin.languages.index',
-            'active_pattern' => 'admin.languages',
+            'active_pattern' => 'admin.languages.*',
             'permission' => 'language-index'
         ],
     ],
