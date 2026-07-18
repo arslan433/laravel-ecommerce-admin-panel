@@ -1,6 +1,5 @@
 <?php
 
-namespace App\Helpers;
 
 use App\Models\Language;
 
@@ -10,3 +9,9 @@ function getAdminDefaultLang($onlyId = true)
     if ($onlyId) return $language->id;
     return $language;
 }
+
+function getLanguages($columns = ['id','name'])
+{
+    return Language::where('status', true)->get($columns);
+}
+?>

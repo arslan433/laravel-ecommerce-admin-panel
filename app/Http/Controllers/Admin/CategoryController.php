@@ -9,7 +9,6 @@ use App\Traits\HasContentAuthorization;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Gate;
 
-use function App\Helpers\getAdminDefaultLang;
 
 class CategoryController extends Controller
 {
@@ -23,9 +22,20 @@ class CategoryController extends Controller
     {
         if ($request->wantsJson() || $request->ajax() || $request->has('draw')) {
             $categories = Category::query()
-            ->leftJoin('category_description as cd', 'cd.category_id', '=', 'categories.id')
-            ->where('cd.language_id', getAdminDefaultLang())
-            ->select('cd.name')->get();
+            // ->leftJoin('category_description as cd', 'cd.category_id', '=', 'categories.id')
+            // ->where('cd.language_id', getAdminDefaultLang())
+            // ->select('cd.name')->get();
+             ->leftJoin('category_descriptions as cd', function ($join) {
+                    $join->on('categories.id', '=', 'cd.category_id')
+                        ->where('cd.language_id', getAdminDefaultLang());
+                })
+                ->select([
+                    'categories.id',
+                    'categories.status',
+                    'categories.sort_order',
+//                    'categories.image',
+                    'cd.name as category_name',
+                ]);
 
 
             return DataTables::eloquent($categories)
@@ -64,15 +74,6 @@ class CategoryController extends Controller
                         . $deleteForm .
                         '</div>';
                 })
-                ->filterColumn('name', function ($query, $keyword) {
-                    $query->where('name', 'like', '%' . $keyword . '%');
-                })
-                ->orderColumn('name', function ($query, $order) {
-                    $query->orderBy('name', $order);
-                })
-                ->orderColumn('id', function ($query, $order) {
-                    $query->orderBy('id', $order);
-                })
                 ->rawColumns(['status', 'action'])
                 ->toJson();
         }
@@ -86,7 +87,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        return $this->authorizeContent('category-create', 'pages.categories.create');
     }
 
     /**
@@ -94,7 +95,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        dd($request->all());
     }
 
     /**

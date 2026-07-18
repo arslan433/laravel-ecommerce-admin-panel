@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 
-use function App\Helpers\getAdminDefaultLang;
 
 class Category extends Model
 {

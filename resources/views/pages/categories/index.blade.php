@@ -17,7 +17,7 @@
                             <a class="btn btn-dark rounded-pill px-4 shadow-sm fw-medium" href="{{ route('admin.categories.create') }}">
                                 Add Category
                             </a>
-                            
+
                             @else
                             <button class="btn btn-dark rounded-pill px-4 shadow-sm fw-medium opacity-50 cursor-not-allowed" disabled>
                                 Add Category
@@ -75,16 +75,11 @@
             ajax: '{{ route("admin.categories.index") }}',
             columns: [{
                     data: 'id',
-                    name: 'id'
                 },
                 {
                     data: 'name',
-                    name: 'name'
                 },
-                {
-                    data: 'status',
-                    name: 'status'
-                },
+
                 {
                     data: 'action',
                     name: 'action',
