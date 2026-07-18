@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
@@ -49,6 +50,15 @@ Route::prefix('admin')->middleware(['auth'])->as('admin.')->group(function () {
         'edit' => 'languages.edit',
         'update' => 'languages.update',
         'destroy' => 'languages.destroy',
+    ])->except('show');
+
+    Route::resource('categories', CategoryController::class)->names([
+        'index' => 'categories.index',
+        'create' => 'categories.create',
+        'store' => 'categories.store',
+        'edit' => 'categories.edit',
+        'update' => 'categories.update',
+        'destroy' => 'categories.destroy',
     ])->except('show');
 });
 
