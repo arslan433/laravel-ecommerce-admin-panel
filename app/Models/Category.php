@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 
 class Category extends Model
@@ -19,15 +20,24 @@ class Category extends Model
     ];
 
     public function description(){
-        $this->hasOne(CategoryDescription::class)->where('language_id' , getAdminDefaultLang());
+       return $this->hasOne(CategoryDescription::class)->where('language_id', getAdminDefaultLang());
     }
     public function descriptions(){
-        $this->hasMany(CategoryDescription::class, 'language_id');
+       return $this->hasMany(CategoryDescription::class);
     }
 
     #[Scope]
     public function lang()
     {
         return $this->description()->where('language_id', getAdminDefaultLang())->first();
+    }
+
+     public function deleteWithImages()
+    {
+        if ($this->attributes['image']) {
+            $file = 'assets/'.$this->attributes['image'];
+            Storage::delete($file);
+        }
+        $this->delete();
     }
 }

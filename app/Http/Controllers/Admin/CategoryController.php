@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CategoryRequest;
 use App\Models\Category;
+use App\Models\CategoryDescription;
 use Illuminate\Http\Request;
 use App\Traits\HasContentAuthorization;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Gate;
-
 
 class CategoryController extends Controller
 {
@@ -22,10 +24,10 @@ class CategoryController extends Controller
     {
         if ($request->wantsJson() || $request->ajax() || $request->has('draw')) {
             $categories = Category::query()
-            // ->leftJoin('category_description as cd', 'cd.category_id', '=', 'categories.id')
-            // ->where('cd.language_id', getAdminDefaultLang())
-            // ->select('cd.name')->get();
-             ->leftJoin('category_descriptions as cd', function ($join) {
+                // ->leftJoin('category_description as cd', 'cd.category_id', '=', 'categories.id')
+                // ->where('cd.language_id', getAdminDefaultLang())
+                // ->select('cd.name')->get();
+                ->leftJoin('category_descriptions as cd', function ($join) {
                     $join->on('categories.id', '=', 'cd.category_id')
                         ->where('cd.language_id', getAdminDefaultLang());
                 })
@@ -33,7 +35,7 @@ class CategoryController extends Controller
                     'categories.id',
                     'categories.status',
                     'categories.sort_order',
-//                    'categories.image',
+                    //'categories.image',
                     'cd.name as category_name',
                 ]);
 
@@ -87,15 +89,55 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return $this->authorizeContent('category-create', 'pages.categories.create');
+        $categories = Category::all();
+        return $this->authorizeContent('category-create', 'pages.categories.create', compact('categories'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        dd($request->all());
+        $validated = $request->all();
+
+        $slug = str($request->translations[1]['name'])->slug();
+
+        DB::transaction(function () use ($slug, $request, $validated) {
+            $image_path = "";
+            if ($request->hasFile('category_image')) {
+                $image = $request->file('category_image');
+
+                $path = public_path('assets/images/categories');
+                if (!file_exists($path)) {
+                    mkdir($path, 0777, true);
+                }
+
+                $file_name = time() . '_' . preg_replace('/\s+/', '_', $image->getClientOriginalName());
+                $image->move($path, $file_name);
+                $image_path = 'images/categories/' . $file_name;
+            }
+                    //    dd($request->all());
+            $category = Category::create(array_merge($validated, [
+                'image' => $image_path,
+                'slug' => $slug
+            ]));
+
+
+            foreach ($request->input('translations', []) as $language_id => $data) {
+                CategoryDescription::create([
+                    'category_id' => $category->id,
+                    'language_id' => $language_id,
+                    'name' => $data['name'],
+                    'description' => $data['description'],
+                    'title_tag' => $data['title_tag'],
+                    'alt_tag' => $data['alt_tag'] ?? '',
+                    'meta_description' => $data['meta_description'],
+                    'meta_keywords' => $data['meta_keywords'],
+                ]);
+            }
+        });
+
+        return to_route('admin.categories.index')->with('success', 'Category created successfully.');
     }
 
     /**
@@ -109,24 +151,68 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Category $category)
     {
-        //
+        // $categories = Category::all();
+        $description = $category->descriptions->keyBy('language_id');
+        $categories = Category::with('description')->where('parent_id', 0)->get();
+
+
+        return $this->authorizeContent('category-edit', 'pages.categories.create', compact('category', 'categories', 'description'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CategoryRequest $request, Category $category)
     {
-        //
+        $validated = $request->all();
+
+        DB::transaction(function () use ($request, $validated, $category) {
+            $image = $category->image ?? null;
+            if ($request->hasFile('category_image')) {
+                $image = $request->file('category_image')->store('images/categories', 'public');
+            }
+
+
+            $category->update(array_merge($validated, [
+                'image' => $image,
+            ]));
+
+            foreach ($request->input('translations', []) as $language_id => $data) {
+//                dd($data);
+                CategoryDescription::updateOrCreate(
+                    [
+                        'category_id' => $category->id,
+                        'language_id' => $language_id,
+                    ],
+                    [
+                        'name' => $data['name'] ?? '',
+                        'description' => $data['description'] ?? '',
+                        'title_tag' => $data['title_tag'] ?? '',
+                        'alt_tag' => $data['alt_tag'] ?? '',
+                        'meta_description' => $data['meta_description'] ?? '',
+                        'meta_keywords' => $data['meta_keywords'] ?? '',
+                    ]
+                );
+            }
+
+        });
+
+        return to_route('admin.categories.index')->with('success', 'Category updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Category $category)
     {
-        //
+        $this->authorizeAction('category-delete');
+         DB::transaction(function () use ($category) {
+            $category->descriptions()->delete();
+            $category->deleteWithImages();
+        });
+
+        return to_route('admin.categories.index')->with('success', 'Category deleted successfully.');
     }
 }
