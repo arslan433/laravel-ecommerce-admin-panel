@@ -25,13 +25,8 @@ class CategoryController extends Controller
     {
         if ($request->wantsJson() || $request->ajax() || $request->has('draw')) {
             $categories = Category::query()
-                // ->leftJoin('category_description as cd', 'cd.category_id', '=', 'categories.id')
-                // ->where('cd.language_id', getAdminDefaultLang())
-                // ->select('cd.name')->get();
-                ->leftJoin('category_descriptions as cd', function ($join) {
-                    $join->on('categories.id', '=', 'cd.category_id')
-                        ->where('cd.language_id', getAdminDefaultLang());
-                })
+                ->leftJoin('category_descriptions as cd', 'cd.category_id', '=', 'categories.id')
+                ->where('cd.language_id', getAdminDefaultLang())
                 ->select([
                     'categories.id',
                     'categories.status',
@@ -98,52 +93,40 @@ class CategoryController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(CategoryRequest $request)
-{
-    $validated = $request->validated();
-    
-    $categoryName = $request->input('translations.1.name') ?? ($request->input('translations')[array_key_first($request->input('translations', []))]['name'] ?? 'category');
-    $slug = str($categoryName)->slug();
+    {
+        $validated = $request->validated();
 
-    DB::transaction(function () use ($slug, $request, $validated) {
-        $image_path = null;
+        $categoryName = $request->input('translations.1.name') ?? ($request->input('translations')[array_key_first($request->input('translations', []))]['name'] ?? 'category');
+        $slug = str($categoryName)->slug();
 
-        if ($request->hasFile('category_image')) {
-            $image = $request->file('category_image');
-            
-            $destinationPath = public_path('images/categories');
-            
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
+        DB::transaction(function () use ($slug, $request, $validated) {
+            $image_path = null;
+
+            if ($request->hasFile('category_image')) {
+                $image_path = $request->file('category_image')->store('images/categories', 'public');
             }
 
-            $file_name = time() . '_' . preg_replace('/\s+/', '_', $image->getClientOriginalName());
-            
-            $image->move($destinationPath, $file_name);
-            
-            $image_path = 'images/categories/' . $file_name;
-        }
+            $category = Category::create(array_merge($validated, [
+                'image' => $image_path,
+                'slug'  => $slug
+            ]));
 
-        $category = Category::create(array_merge($validated, [
-            'image' => $image_path,
-            'slug'  => $slug
-        ]));
+            foreach ($request->input('translations', []) as $language_id => $data) {
+                CategoryDescription::create([
+                    'category_id'      => $category->id,
+                    'language_id'      => $language_id,
+                    'name'             => $data['name'] ?? '',
+                    'description'      => $data['description'] ?? '',
+                    'title_tag'        => $data['title_tag'] ?? '',
+                    'alt_tag'          => $data['alt_tag'] ?? '',
+                    'meta_description' => $data['meta_description'] ?? '',
+                    'meta_keywords'    => $data['meta_keywords'] ?? '',
+                ]);
+            }
+        });
 
-        foreach ($request->input('translations', []) as $language_id => $data) {
-            CategoryDescription::create([
-                'category_id'      => $category->id,
-                'language_id'      => $language_id,
-                'name'             => $data['name'] ?? '',
-                'description'      => $data['description'] ?? '',
-                'title_tag'        => $data['title_tag'] ?? '',
-                'alt_tag'          => $data['alt_tag'] ?? '',
-                'meta_description' => $data['meta_description'] ?? '',
-                'meta_keywords'    => $data['meta_keywords'] ?? '',
-            ]);
-        }
-    });
-
-    return to_route('admin.categories.index')->with('success', 'Category created successfully.');
-}
+        return to_route('admin.categories.index')->with('success', 'Category created successfully.');
+    }
 
 
     /**
@@ -170,57 +153,45 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-   public function update(CategoryRequest $request, Category $category)
-{
-    $validated = $request->validated();
+    public function update(CategoryRequest $request, Category $category)
+    {
+        $validated = $request->validated();
 
-    DB::transaction(function () use ($request, $validated, $category) {
-        
-        if ($request->hasFile('category_image')) {
-            $image = $request->file('category_image');
-            
-            $destinationPath = public_path('images/categories');
+        DB::transaction(function () use ($request, $validated, $category) {
 
-            if ($category->image && file_exists(public_path($category->image))) {
-                @unlink(public_path($category->image));
+            if ($request->hasFile('category_image')) {
+
+                if ($category->image && Storage::disk('public')->exists($category->image)) {
+                    Storage::disk('public')->delete($category->image);
+                }
+
+                $validated['image'] = $request->file('category_image')->store('images/categories', 'public');
+            } else {
+                $validated['image'] = $category->image;
             }
 
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
+            $category->update($validated);
+
+            foreach ($request->input('translations', []) as $language_id => $data) {
+                CategoryDescription::updateOrCreate(
+                    [
+                        'category_id' => $category->id,
+                        'language_id' => $language_id,
+                    ],
+                    [
+                        'name'             => $data['name'] ?? '',
+                        'description'      => $data['description'] ?? '',
+                        'title_tag'        => $data['title_tag'] ?? '',
+                        'alt_tag'          => $data['alt_tag'] ?? '',
+                        'meta_description' => $data['meta_description'] ?? '',
+                        'meta_keywords'    => $data['meta_keywords'] ?? '',
+                    ]
+                );
             }
+        });
 
-            $file_name = time() . '_' . preg_replace('/\s+/', '_', $image->getClientOriginalName());
-            
-            $image->move($destinationPath, $file_name);
-            
-            $validated['image'] = 'images/categories/' . $file_name;
-        } else {
-            $validated['image'] = $category->image;
-        }
-
-        $category->update($validated);
-
-        foreach ($request->input('translations', []) as $language_id => $data) {
-            CategoryDescription::updateOrCreate(
-                [
-                    'category_id' => $category->id,
-                    'language_id' => $language_id,
-                ],
-                [
-                    'name'             => $data['name'] ?? '',
-                    'description'      => $data['description'] ?? '',
-                    'title_tag'        => $data['title_tag'] ?? '',
-                    'alt_tag'          => $data['alt_tag'] ?? '',
-                    'meta_description' => $data['meta_description'] ?? '',
-                    'meta_keywords'    => $data['meta_keywords'] ?? '',
-                ]
-            );
-        }
-    });
-
-    return to_route('admin.categories.index')->with('success', 'Category updated successfully.');
-}
-
+        return to_route('admin.categories.index')->with('success', 'Category updated successfully.');
+    }
 
 
     /**

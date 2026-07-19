@@ -32,12 +32,15 @@ class Category extends Model
         return $this->description()->where('language_id', getAdminDefaultLang())->first();
     }
 
-     public function deleteWithImages()
-    {
-        if ($this->attributes['image']) {
-            $file = 'assets/'.$this->attributes['image'];
-            Storage::delete($file);
+    public function deleteWithImages()
+{
+    if (!empty($this->image)) {
+        if (Storage::disk('public')->exists($this->image)) {
+            Storage::disk('public')->delete($this->image);
         }
-        $this->delete();
     }
+
+    return $this->delete();
+}
+
 }

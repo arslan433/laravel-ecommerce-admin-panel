@@ -143,7 +143,7 @@
         @enderror
         @if(isset($category) && $category->image)
             <div class="mt-2">
-                <img src="{{ asset($category->image) }}" alt="{{ $category->lang()->name ?? 'Category Image' }}" width="120" style="border-radius: 6px;">
+                <img src="{{ asset('storage/'. $category->image) }}" alt="{{ $category->lang()->name ?? 'Category Image' }}" width="120" style="border-radius: 6px;">
             </div>
         @endif
     </div>

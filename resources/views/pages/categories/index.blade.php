@@ -50,6 +50,7 @@
                                 <tr>
                                     <th class="py-2 text-muted fw-bold">#</th>
                                     <th class="py-2 text-muted fw-bold">Name</th>
+                                    <th class="py-2 text-muted fw-bold">Status</th>
                                     <th class="py-2 px-4 text-muted fw-bold">Actions</th>
                                 </tr>
                             </thead>
@@ -79,6 +80,12 @@
                     data: 'category_name',
                 },
 
+                {
+                    data: 'status',
+                    name: 'status',
+                    orderable: false,
+                    searchable: false
+                },
                 {
                     data: 'action',
                     name: 'action',
