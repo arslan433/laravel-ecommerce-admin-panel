@@ -11,6 +11,7 @@ use App\Traits\HasContentAuthorization;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -97,48 +98,53 @@ class CategoryController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(CategoryRequest $request)
-    {
-        $validated = $request->all();
+{
+    $validated = $request->validated();
+    
+    $categoryName = $request->input('translations.1.name') ?? ($request->input('translations')[array_key_first($request->input('translations', []))]['name'] ?? 'category');
+    $slug = str($categoryName)->slug();
 
-        $slug = str($request->translations[1]['name'])->slug();
+    DB::transaction(function () use ($slug, $request, $validated) {
+        $image_path = null;
 
-        DB::transaction(function () use ($slug, $request, $validated) {
-            $image_path = "";
-            if ($request->hasFile('category_image')) {
-                $image = $request->file('category_image');
-
-                $path = public_path('assets/images/categories');
-                if (!file_exists($path)) {
-                    mkdir($path, 0777, true);
-                }
-
-                $file_name = time() . '_' . preg_replace('/\s+/', '_', $image->getClientOriginalName());
-                $image->move($path, $file_name);
-                $image_path = 'images/categories/' . $file_name;
+        if ($request->hasFile('category_image')) {
+            $image = $request->file('category_image');
+            
+            $destinationPath = public_path('images/categories');
+            
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
             }
-                    //    dd($request->all());
-            $category = Category::create(array_merge($validated, [
-                'image' => $image_path,
-                'slug' => $slug
-            ]));
 
+            $file_name = time() . '_' . preg_replace('/\s+/', '_', $image->getClientOriginalName());
+            
+            $image->move($destinationPath, $file_name);
+            
+            $image_path = 'images/categories/' . $file_name;
+        }
 
-            foreach ($request->input('translations', []) as $language_id => $data) {
-                CategoryDescription::create([
-                    'category_id' => $category->id,
-                    'language_id' => $language_id,
-                    'name' => $data['name'],
-                    'description' => $data['description'],
-                    'title_tag' => $data['title_tag'],
-                    'alt_tag' => $data['alt_tag'] ?? '',
-                    'meta_description' => $data['meta_description'],
-                    'meta_keywords' => $data['meta_keywords'],
-                ]);
-            }
-        });
+        $category = Category::create(array_merge($validated, [
+            'image' => $image_path,
+            'slug'  => $slug
+        ]));
 
-        return to_route('admin.categories.index')->with('success', 'Category created successfully.');
-    }
+        foreach ($request->input('translations', []) as $language_id => $data) {
+            CategoryDescription::create([
+                'category_id'      => $category->id,
+                'language_id'      => $language_id,
+                'name'             => $data['name'] ?? '',
+                'description'      => $data['description'] ?? '',
+                'title_tag'        => $data['title_tag'] ?? '',
+                'alt_tag'          => $data['alt_tag'] ?? '',
+                'meta_description' => $data['meta_description'] ?? '',
+                'meta_keywords'    => $data['meta_keywords'] ?? '',
+            ]);
+        }
+    });
+
+    return to_route('admin.categories.index')->with('success', 'Category created successfully.');
+}
+
 
     /**
      * Display the specified resource.
@@ -164,43 +170,58 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CategoryRequest $request, Category $category)
-    {
-        $validated = $request->all();
+   public function update(CategoryRequest $request, Category $category)
+{
+    $validated = $request->validated();
 
-        DB::transaction(function () use ($request, $validated, $category) {
-            $image = $category->image ?? null;
-            if ($request->hasFile('category_image')) {
-                $image = $request->file('category_image')->store('images/categories', 'public');
+    DB::transaction(function () use ($request, $validated, $category) {
+        
+        if ($request->hasFile('category_image')) {
+            $image = $request->file('category_image');
+            
+            $destinationPath = public_path('images/categories');
+
+            if ($category->image && file_exists(public_path($category->image))) {
+                @unlink(public_path($category->image));
             }
 
-
-            $category->update(array_merge($validated, [
-                'image' => $image,
-            ]));
-
-            foreach ($request->input('translations', []) as $language_id => $data) {
-//                dd($data);
-                CategoryDescription::updateOrCreate(
-                    [
-                        'category_id' => $category->id,
-                        'language_id' => $language_id,
-                    ],
-                    [
-                        'name' => $data['name'] ?? '',
-                        'description' => $data['description'] ?? '',
-                        'title_tag' => $data['title_tag'] ?? '',
-                        'alt_tag' => $data['alt_tag'] ?? '',
-                        'meta_description' => $data['meta_description'] ?? '',
-                        'meta_keywords' => $data['meta_keywords'] ?? '',
-                    ]
-                );
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
             }
 
-        });
+            $file_name = time() . '_' . preg_replace('/\s+/', '_', $image->getClientOriginalName());
+            
+            $image->move($destinationPath, $file_name);
+            
+            $validated['image'] = 'images/categories/' . $file_name;
+        } else {
+            $validated['image'] = $category->image;
+        }
 
-        return to_route('admin.categories.index')->with('success', 'Category updated successfully.');
-    }
+        $category->update($validated);
+
+        foreach ($request->input('translations', []) as $language_id => $data) {
+            CategoryDescription::updateOrCreate(
+                [
+                    'category_id' => $category->id,
+                    'language_id' => $language_id,
+                ],
+                [
+                    'name'             => $data['name'] ?? '',
+                    'description'      => $data['description'] ?? '',
+                    'title_tag'        => $data['title_tag'] ?? '',
+                    'alt_tag'          => $data['alt_tag'] ?? '',
+                    'meta_description' => $data['meta_description'] ?? '',
+                    'meta_keywords'    => $data['meta_keywords'] ?? '',
+                ]
+            );
+        }
+    });
+
+    return to_route('admin.categories.index')->with('success', 'Category updated successfully.');
+}
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -208,7 +229,7 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $this->authorizeAction('category-delete');
-         DB::transaction(function () use ($category) {
+        DB::transaction(function () use ($category) {
             $category->descriptions()->delete();
             $category->deleteWithImages();
         });
