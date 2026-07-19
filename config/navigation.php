@@ -59,10 +59,17 @@ return [
         // ],
         [
             'label' => 'Languages',
-            'icon' => 'fa-solid fa-gear',
+            'icon' => 'fa-solid fa-language',
             'route' => 'admin.languages.index',
-            'active_pattern' => 'admin.languages',
+            'active_pattern' => 'admin.languages.*',
             'permission' => 'language-index'
+        ],
+        [
+            'label' => 'Categories',
+            'icon' => 'fa-solid fa-layer-group',
+            'route' => 'admin.categories.index',
+            'active_pattern' => 'admin.categories.*',
+            'permission' => 'category-index'
         ],
     ],
 ];

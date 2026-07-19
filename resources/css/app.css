@@ -73,6 +73,36 @@
     box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.05) !important;
 }
 
+/* Base button elements */
+.page-link {
+    background-color: #2b3035 !important;
+    color: #fff !important;
+    /* border: 1px solid #373b3e !important; */
+}
+
+/* Hover state effect */
+.page-link:hover,
+.paginate_button:hover {
+    background-color: #3b4248 !important;
+}
+
+/* Active Page State Element (Current Page Item) */
+.page-item.active .page-link,
+.paginate_button.current {
+    background-color: #212529 !important;
+    color: #ffffff !important;
+    border-color: #212529 !important;
+    font-weight: bold;
+}
+
+/* Disabled buttons arrow states */
+.page-item.disabled .page-link {
+    background-color: #f8f9fa !important;
+    color: #000 !important;
+    /* border-color: #323539 !important; */
+}
+
+
 .text-sm {
     font-size: 0.9rem;
 }
@@ -127,7 +157,7 @@
     color: #d9002f !important;
 }
 
-.custom-edit{
+.custom-edit {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -143,8 +173,10 @@
     text-decoration: none;
     transition: background-color 0.2s ease-in-out;
 }
-.custom-edit:hover{
-        background-color: #e2e8f0; /* slate color */
+
+.custom-edit:hover {
+    background-color: #e2e8f0;
+    /* slate color */
 
 }
 
@@ -154,16 +186,23 @@
     justify-content: center;
     background: transparent;
     border: none;
-    color: #dc3545; /* text-danger */
-    text-decoration: none; /* text-decoration-none */
-    border-radius: 9999px; /* rounded-pill */
-    padding: 0.40rem 0.75rem; /* py-1 px-3 */
-    font-size: 0.875rem; /* text-sm */
-    font-weight: 500; /* fw-medium */
+    color: #dc3545;
+    /* text-danger */
+    text-decoration: none;
+    /* text-decoration-none */
+    border-radius: 9999px;
+    /* rounded-pill */
+    padding: 0.40rem 0.75rem;
+    /* py-1 px-3 */
+    font-size: 0.875rem;
+    /* text-sm */
+    font-weight: 500;
+    /* fw-medium */
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
-  }
+}
 
-  .custom-delete:hover {
-    background-color: #f8d7da; /* Light red/danger subtle background */
-  }
+.custom-delete:hover {
+    background-color: #f8d7da;
+    /* Light red/danger subtle background */
+}

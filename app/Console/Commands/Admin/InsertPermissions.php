@@ -51,7 +51,8 @@ class InsertPermissions extends Command
             'user',
             'role',
             'permission',
-            'language'
+            'language',
+            'category'
         ];
     }
 
